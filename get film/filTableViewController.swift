@@ -57,7 +57,7 @@ class filTableViewController: UITableViewController {
     }
     
 }
-// MARK: - SWAPIFilmsResponse
+// MARK: - api
 struct api: Codable {
     let results: [Film]
 }
