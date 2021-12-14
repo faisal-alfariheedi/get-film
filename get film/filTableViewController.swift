@@ -12,26 +12,29 @@ class filTableViewController: UITableViewController {
     @IBOutlet var table: UITableView!
     
     var fil = [String]()
+    var mfil = film()
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        URLSession.shared.dataTask(with: URL(string: "https://swapi.dev/api/films/?format=json")! , completionHandler: {
-                    data, response, error in
-                    do{
-                        let res = try JSONDecoder().decode(api.self, from: data!)
-                        print(res)
-                        for film in res.results{
-                            print(film.title)
-                            self.fil.append(film.title)
-                        }
-                        
-                        DispatchQueue.main.async {
-                            self.table.reloadData()
-                        }
-                    }catch{
-                        print("Error \(error)")
-                    }
-                }).resume()
+        
+        mfil.getAllPeople(completionHandler: {
+            data, response, error in
+            do{
+                let res = try JSONDecoder().decode(api.self, from: data!)
+                print(res)
+                for film in res.results{
+                    print(film.title)
+                    self.fil.append(film.title)
+                }
+                
+                DispatchQueue.main.async {
+                    self.table.reloadData()
+                }
+            }catch{
+                print("Error \(error)")
+            }
+        
+        })
     
     }
 
@@ -65,5 +68,14 @@ struct api: Codable {
 // MARK: - Result
 struct Film : Codable {
     let title: String
+    
+}
+// MARK: - filmmodel
+class film {
+    func getAllPeople(completionHandler:@escaping (_ data: Data?, _ response: URLResponse?, _ error: Error?) -> Void) {
+            
+        
+            let task = URLSession.shared.dataTask(with: URL(string: "https://swapi.dev/api/films/?format=json")!, completionHandler: completionHandler).resume()
+        }
     
 }
