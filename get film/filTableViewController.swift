@@ -7,11 +7,12 @@
 
 import UIKit
 
+
 class filTableViewController: UITableViewController {
 
     @IBOutlet var table: UITableView!
     
-    var fil = [String]()
+    var fil = [Film]()
     var mfil = film()
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -24,7 +25,7 @@ class filTableViewController: UITableViewController {
                 print(res)
                 for film in res.results{
                     print(film.title)
-                    self.fil.append(film.title)
+                    self.fil.append(film)
                 }
                 
                 DispatchQueue.main.async {
@@ -36,6 +37,21 @@ class filTableViewController: UITableViewController {
         
         })
     
+    }
+    func alert(mes :String) {
+        let alert = UIAlertController(title: "detail", message: mes, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ok", style: .cancel, handler: { [self] action in
+            switch action.style{
+                case .cancel:
+                    break
+                    
+                 default:
+                    print("")
+            }
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
     }
 
     // MARK: - Table view data source
@@ -54,20 +70,27 @@ class filTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "tcell", for: indexPath)
 
-        cell.textLabel?.text = fil[indexPath.row]
+        cell.textLabel?.text = fil[indexPath.row].title
         
         return cell
     }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        alert(mes: "Title: \(fil[indexPath.row].title)\nRelease_Date: \(fil[indexPath.row].Release_Date)\nDirector: \(fil[indexPath.row].Director)\nOpening_Crawl: \(fil[indexPath.row].Opening_Crawl)\n")
+    }
     
 }
-// MARK: - SWAPIFilmsResponse
+// MARK: - api
 struct api: Codable {
     let results: [Film]
+    
 }
 
 // MARK: - Result
 struct Film : Codable {
     let title: String
+    let Release_Date: String
+    let Director: String
+    let Opening_Crawl: String
     
 }
 // MARK: - filmmodel

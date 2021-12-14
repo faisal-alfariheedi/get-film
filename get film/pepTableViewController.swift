@@ -9,7 +9,7 @@ import UIKit
 
 class TableViewController: UITableViewController {
 
-    var pep : [String] = []
+    var pep : [Pep] = []
         
     @IBOutlet var table: UITableView!
     
@@ -21,18 +21,25 @@ class TableViewController: UITableViewController {
             mpep.getAllPeople(completionHandler: { [self]
                 data, response, error in
                 do{
-                    if let jr = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary {
+                    if let jr = try JSONSerialization.jsonObject(with: data! , options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary {
                         if let res = jr["count"] as? NSInteger {
                             self.mpep.co = res
                             print(self.mpep.co)
                             self.mpep.getpep(completionHandler: {
                                 data, response, error in
                                 do{
+//                                    do {
+////                                        print(response)
+//                                        pep.append(try JSONDecoder().decode(Pep.self, from: data!))
+//
+//                                    } catch {
+//                                        print("Failed to decode JSON \(error)")
+//                                    }
                                     if let jr = try JSONSerialization.jsonObject(with: data!, options: JSONSerialization.ReadingOptions.mutableContainers) as? NSDictionary {
                                         if let res = jr as? NSDictionary {
                                             print("  " , res["name"])
                                             if(res["name"] != nil){
-                                                self.pep.append(try res["name"] as! String)
+                                                self.pep.append(try Pep(name: res["name"] as! String, gender: res["gender"] as! String, birth_year: res["birth_year"] as! String, mass: res["mass"] as! String))
                                                 DispatchQueue.main.async {
                                                         self.table.reloadData()
                                                     }
@@ -71,14 +78,49 @@ class TableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
 
-        cell.textLabel?.text = pep[indexPath.row]
+        cell.textLabel?.text = pep[indexPath.row].name
 
         return cell
+    }
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        alert(mes: "name: \(pep[indexPath.row].name)\ngender: \(pep[indexPath.row].gender)\nbirth year: \(pep[indexPath.row].birth_year)\nmass: \(pep[indexPath.row].mass)\n")
+    }
+    
+    func alert(mes :String) {
+        let alert = UIAlertController(title: "detail", message: mes, preferredStyle: .alert)
+        alert.addAction(UIAlertAction(title: "ok", style: .cancel, handler: { [self] action in
+            switch action.style{
+                case .cancel:
+                    break
+                    
+                 default:
+                    print("")
+            }
+        }))
+        
+        self.present(alert, animated: true, completion: nil)
+        
     }
     
 
   
 
+}
+// MARK: - api
+struct pepapi: Codable {
+    let results: [Pep]
+    
+}
+
+// MARK: - Result
+struct Pep : Codable {
+    let name: String
+    let gender: String
+    let birth_year: String
+    let mass: String
+    
+    
+    
 }
 
 // MARK: - pepmodel
